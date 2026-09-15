@@ -1,0 +1,218 @@
+.act-word {
+  font-family:'JetBrains Mono',monospace;
+  font-weight:700;
+  color:var(--white);
+  line-height:1;
+  margin:12px 0 6px;
+  display:flex;
+  justify-content:center;
+  align-items:baseline;
+}
+.act-word .first { font-size:calc(9.5rem * var(--k)); letter-spacing:-0.02em; }
+.act-word .rest { font-size:calc(2.4rem * var(--k)); letter-spacing:0.08em; opacity:0.25; }
+.act-word.pid .first { font-size:calc(6.8rem * var(--k)); letter-spacing:0.12em; }
+.act-word.pid .rest  { display:none; }
+
+.act-cn {
+  font-family:'PingFang SC','Songti SC',serif;
+  font-size:calc(1.45rem * var(--k));
+  color:var(--text);
+  margin-bottom:6px;
+}
+
+/* 公式一律不换行：字号被屏幕宽度卡住，系数按“最宽那一段刚好放得下还得留点余量”定 */
+.formula {
+  font-family:'JetBrains Mono',monospace;
+  font-size:clamp(1.9rem,4.5vw,calc(2.8rem * var(--k))); color:var(--white);
+  white-space:nowrap;
+  padding:12px 0;
+  margin:10px 0;
+  line-height:2;
+}
+.formula .label {
+  font-family:'PingFang SC','Songti SC',serif;
+  font-size:calc(1rem * var(--k)); color:var(--muted);
+  display:block; margin-bottom:8px; letter-spacing:0.15em;
+}
+
+.formula-big {
+  font-family:'JetBrains Mono',monospace;
+  font-size:clamp(1.9rem,4.5vw,calc(3.2rem * var(--k))); color:var(--white);
+  padding:16px 0;
+  margin:10px 0;
+  line-height:2.4;
+  display:flex;
+  flex-wrap:nowrap;
+  justify-content:center;
+  align-items:center;
+  gap:4px 14px;
+  opacity:0; transform:translateY(10px);
+  transition:opacity 0.4s ease, transform 0.4s ease;
+}
+/* 禁止收缩，否则各段会被压窄并在内部折行 */
+.formula-big > * { flex:none; }
+.slide.active .formula-big { opacity:1; transform:none; }
+
+.frac {
+  display:inline-flex;
+  flex-direction:column;
+  align-items:center;
+  vertical-align:middle;
+  line-height:1.2;
+  margin:0 2px;
+}
+.frac .num {
+  border-bottom:1.5px solid var(--white);
+  padding:0 4px 3px;
+}
+.frac .den {
+  padding:3px 4px 0;
+}
+
+.roles { margin:14px auto; text-align:left; max-width:900px; }
+.role {
+  display:flex; align-items:baseline; gap:14px;
+  padding:6px 0; border-bottom:1px solid var(--border);
+}
+.role:last-child { border-bottom:none; }
+.role-l {
+  font-family:'JetBrains Mono',monospace;
+  font-size:calc(1.1rem * var(--k)); font-weight:700;
+  color:var(--white); min-width:230px;
+  letter-spacing:0.05em;
+}
+.role-t { font-size:calc(1.4rem * var(--k)); color:var(--text); }
+.role-s { font-size:calc(1.1rem * var(--k)); color:var(--muted); margin-left:3px; }
+
+.curve-wrap {
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity 0.6s ease 0.2s;
+}
+.slide.active .curve-wrap { opacity:1; }
+.curve-wrap svg { width:100%; height:100%; }
+/* y=285 那条水平的「平了」参考线。以前一直没画出来，曲线停在哪儿全靠脑补；
+   有了它，「停在线上」和「停在下方一截不动了」才分得出来。绿对黄，一眼分得清哪条是目标、
+   哪条是实际走的；0.4 的绿压在近黑底上算出来约 rgb(4,106,4)，亮度只有黄曲线的三分之一，
+   看得见但不跟曲线抢。 */
+.curve-wrap .c-lvl {
+  fill:none;
+  stroke:var(--green);
+  stroke-width:1;
+  stroke-dasharray:9 11;
+  opacity:0.4;
+}
+/* 曲线：整份 deck 里唯一一处彩色，纯黄。原来是一道 0.12 的白，几乎是隐形的；
+   现在它得真被看见 —— 0.12 的黄压在近黑底上会变成一坨发暗的橄榄色，不叫鲜艳，
+   所以透明度拉到 0.9（对着 #060606 这种底，0.9 和 1.0 肉眼没区别，留一点余地好调）。 */
+.curve-wrap .c1 {
+  fill:none;
+  stroke:var(--yellow);
+  stroke-width:1.5;
+  opacity:0.9;
+}
+
+/* 「动态攒偏差」那页的天平动画。920×300 是画布，窄屏在 responsive.css 里整块缩放。
+   一条 7.4 秒的时间线（秒 → 百分比，写在下面的百分比里）：0.5 左边吹下来，梁歪 -7°，
+   方块往右挪 130 抵消，2.6 梁平；3.0 右边吹下来，+6°，方块挪到 -50，5.1 梁平；
+   5.5 右边往上吹，-3.5°，方块挪回 +40，7.1 梁平。全部挂在
+   .slide.active 下，翻到这一页才播。方块离中点多远，就是攒下来的偏差之和。 */
+.bal { position:relative; width:920px; max-width:100%; height:300px; margin:26px auto 0; }
+.bal-stage {
+  position:absolute; top:0; left:50%;
+  width:920px; height:300px;
+  transform:translateX(-50%);
+  transform-origin:top center;
+}
+
+/* 那条水平的「平了」参考线，梁绕着中点转，线不动，一眼看出歪没歪 */
+.bal-level {
+  position:absolute; left:180px; top:132px; width:560px; height:0;
+  border-top:2px dashed var(--line);
+}
+.bal-level-tag {
+  position:absolute; left:748px; top:106px;
+  font-size:26px; color:var(--muted); letter-spacing:0.12em;
+}
+
+/* 横梁：绕中点转；方块挂在梁上，跟着一起歪 */
+.bal-beam {
+  position:absolute; left:50%; top:132px; width:560px; height:6px; margin:-3px 0 0 -280px;
+  background:var(--white); opacity:0.5;
+  transform-origin:50% 50%;
+}
+.bal-block {
+  position:absolute; left:50%; bottom:6px; width:26px; height:64px; margin-left:-13px;
+  background:var(--white); opacity:0.85;
+}
+.bal-fulcrum {
+  position:absolute; left:50%; top:135px; margin-left:-16px;
+  width:0; height:0;
+  border-left:16px solid transparent;
+  border-right:16px solid transparent;
+  border-bottom:26px solid var(--muted);
+}
+
+/* 风：随机从左边或右边吹，上吹下吹都有 */
+.bal-gust {
+  position:absolute; font-family:'JetBrains Mono',monospace;
+  font-size:60px; line-height:1; color:var(--text); opacity:0;
+}
+.bal-gust--a { left:76px; top:44px; }
+.bal-gust--b { left:824px; top:44px; }
+.bal-gust--c { left:824px; top:184px; }
+
+/* 方块离中点的那段距离 = 偏差之和（往右为正、往左为负） */
+.bal-tick { position:absolute; left:459px; top:192px; width:2px; height:18px; background:var(--line); }
+.bal-dim { position:absolute; top:200px; height:2px; background:var(--muted); }
+.bal-sum-tag {
+  position:absolute; left:460px; top:206px; transform:translateX(-50%);
+  font-size:26px; color:var(--muted); letter-spacing:0.12em; white-space:nowrap;
+}
+
+.slide.active .bal-beam { animation:bal-tilt 7.4s cubic-bezier(.5,0,.5,1) both; }
+.slide.active .bal-block { animation:bal-slide 7.4s cubic-bezier(.5,0,.5,1) both; }
+.slide.active .bal-dim { animation:bal-measure 7.4s cubic-bezier(.5,0,.5,1) both; }
+.slide.active .bal-gust--a { animation:bal-gust-a 7.4s linear both; }
+.slide.active .bal-gust--b { animation:bal-gust-b 7.4s linear both; }
+.slide.active .bal-gust--c { animation:bal-gust-c 7.4s linear both; }
+
+/* 梁歪 → 方块往反方向挪 → 梁回平；歪得越少挪得越慢 */
+@keyframes bal-tilt {
+  0%, 6.8% { transform:rotate(0deg); }
+  14.9% { transform:rotate(-7deg); }
+  35.1%, 40.5% { transform:rotate(0deg); }
+  48.6% { transform:rotate(6deg); }
+  68.9%, 74.3% { transform:rotate(0deg); }
+  79.7% { transform:rotate(-3.5deg); }
+  95.9%, 100% { transform:rotate(0deg); }
+}
+@keyframes bal-slide {
+  0%, 14.9% { transform:translateX(0); }
+  35.1%, 48.6% { transform:translateX(130px); }
+  68.9%, 79.7% { transform:translateX(-50px); }
+  95.9%, 100% { transform:translateX(40px); }
+}
+@keyframes bal-measure {
+  0%, 14.9% { left:460px; width:0; }
+  35.1%, 48.6% { left:460px; width:130px; }
+  68.9%, 79.7% { left:410px; width:50px; }
+  95.9%, 100% { left:460px; width:40px; }
+}
+@keyframes bal-gust-a {
+  0%, 4% { opacity:0; }
+  6.8%, 32% { opacity:0.9; }
+  38%, 100% { opacity:0; }
+}
+@keyframes bal-gust-b {
+  0%, 38% { opacity:0; }
+  40.5%, 66% { opacity:0.9; }
+  72%, 100% { opacity:0; }
+}
+@keyframes bal-gust-c {
+  0%, 71% { opacity:0; }
+  74.3%, 92% { opacity:0.9; }
+  97%, 100% { opacity:0; }
+}

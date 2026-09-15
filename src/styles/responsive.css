@@ -1,0 +1,40 @@
+/* 窄屏不跟桌面的 --k 倍率走：屏幕只有 390px 宽，翻倍后一行放不下几个字。
+   这里把整个字号表重新写死一遍，桌面改 --k 不会波及手机。 */
+@media(max-width:768px){
+  .slide{padding:28px 20px;}
+  .s{max-width:100%;}
+  .t-xl{font-size:3.6rem;}
+  /* 这一档要比上面小：同名规则在本块里排在后面，会把 .t-xl--sm 覆盖掉 */
+  .t-xl--sm{font-size:3rem;}
+  .t-hero{font-size:4rem;}
+  .t-big{font-size:2.3rem;}
+  .t-mid{font-size:1.8rem;}
+  .t-sm{font-size:1.5rem;}
+  .act-word{margin:8px 0 4px;}
+  .act-word .first{font-size:7.6rem;}
+  .act-word .rest{font-size:2rem;}
+  .act-word.pid .first{font-size:5rem;}
+  .act-cn{font-size:1.7rem;}
+  /* 窄屏一行排不下公式，放开换行，否则会被裁掉 */
+  .formula{font-size:1.9rem;white-space:normal;}
+  .formula .label{font-size:1.4rem;}
+  .formula-big{font-size:2.1rem;flex-wrap:wrap;}
+  .roles{max-width:100%;}
+  .role-l{min-width:120px;font-size:1.2rem;}
+  .role-t{font-size:1.7rem;}
+  .role-s{font-size:1.3rem;}
+  /* 动画那页是 920×300 的死画布，窄屏整块缩，别让它撑出屏幕 */
+  .bal{height:114px;}
+  .bal-stage{transform:translateX(-50%) scale(0.38);}
+}
+
+/* 769–1199px 是个尴尬档：版式已经是桌面那一套，但窗口只有一半大，2 倍字号
+   会把标题顶成两行、正文撑到屏幕外。整档把倍率收回 1.5，公式的系数再单独收
+   一档（下面两行），避免横向溢出。手机档在上面重写了字号表，不受这里影响。 */
+@media(min-width:769px) and (max-width:1199px){
+  :root{--k:1.5;}
+  .formula{font-size:clamp(1.9rem,4vw,4rem);}
+  .formula-big{font-size:clamp(1.9rem,4vw,5rem);}
+  .bal{height:216px;}
+  .bal-stage{transform:translateX(-50%) scale(0.72);}
+}

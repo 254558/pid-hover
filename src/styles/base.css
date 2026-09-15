@@ -1,0 +1,33 @@
+:root {
+  /* 全局字号倍率：文案尺寸都由它乘出来，改这一个数整页一起缩放 */
+  --k: 2;
+  --bg: #060606;
+  --border: #1a1a1a;
+  --line: #282828;
+  --text: #c0c0c0;
+  --muted: #4a4a4a;
+  --white: #e4e4e4;
+  /* 背景曲线上唯一的两处彩色：黄是实际走出来的那条线，绿是那条水平的「平了」参考线。
+     整份 deck 的灰阶就靠这两支颜色分开「跑成什么样」和「目标在哪」。 */
+  --yellow: #ffff00;
+  --green: #00ff00;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; border-radius:0; }
+
+body {
+  background:var(--bg);
+  color:var(--text);
+  font-family:'PingFang SC','Songti SC',serif;
+  overflow:hidden;
+  height:100vh;
+  width:100vw;
+  user-select:none;
+  cursor:default;
+}
+
+/* .pres 靠 height:100% 撑满，中间这层必须有确定高度，否则百分比高度会退化成 auto */
+#root {
+  width:100%;
+  height:100%;
+}
