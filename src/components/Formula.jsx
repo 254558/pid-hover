@@ -1,6 +1,6 @@
-export default function Formula({ label, children }) {
+export default function Formula({ label, className, children }) {
   return (
-    <div className="formula">
+    <div className={className ? `formula ${className}` : 'formula'}>
       {label && <span className="label">{label}</span>}
       {children}
     </div>

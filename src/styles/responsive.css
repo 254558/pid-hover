@@ -34,6 +34,8 @@
 @media(min-width:769px) and (max-width:1199px){
   :root{--k:1.5;}
   .formula{font-size:clamp(1.9rem,4vw,4rem);}
+  /* 全式那条（.formula--law）跟着这一档一起收 0.85，理由见 components.css */
+  .formula--law{font-size:clamp(1.9rem,3.4vw,3.4rem);}
   .formula-big{font-size:clamp(1.9rem,4vw,5rem);}
   .bal{height:216px;}
   .bal-stage{transform:translateX(-50%) scale(0.72);}

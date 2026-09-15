@@ -34,6 +34,14 @@
   font-size:calc(1rem * var(--k)); color:var(--muted);
   display:block; margin-bottom:8px; letter-spacing:0.15em;
 }
+/* 最后一页那条「全式」比别的公式长一大截：把 D 那一项从「角速度」改成「误差的变化率」之后，
+   1280 宽下量出来要 1313px，而栏宽只有 1200px —— 公式是 nowrap，多出来的会被画框裁掉。
+   所以只让这一条小一档（0.85 倍）。为什么不拆成两行、也不改全局字号：前者会改掉这页的
+   版式轮廓（别页都是一行居中），后者会把本来放得下的 P 页、D 页一起缩小。
+   0.85 是按留出余量定的：1313 × 0.85 = 1116px，栏宽 1200px，还剩 84px。
+   窄屏两档在 responsive.css 里跟着重写（那条必须写在那边：responsive 最后加载，
+   同等优先级下它的 .formula 会盖掉这里）。 */
+.formula--law { font-size:calc(clamp(1.9rem,4.5vw,calc(2.8rem * var(--k))) * 0.85); }
 
 .formula-big {
   font-family:'JetBrains Mono',monospace;

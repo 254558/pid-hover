@@ -13,17 +13,17 @@ const BlindToRate = () => (
   </>
 );
 
-const CombinedLaw = () => (
-  <Formula label="Proportional + Derivative">P × 倾斜角度 + D × 角速度</Formula>
-);
-
 const EarlyBraking = () => (
   <div className="t-big">预判惯性，提前收力</div>
+);
+
+const CombinedLaw = () => (
+  <Formula>P × 误差 + D × 误差的变化率</Formula>
 );
 
 export default [
   { content: DerivativeIntro },
   { content: BlindToRate },
-  { content: CombinedLaw },
   { content: EarlyBraking, backdrop: damped },
+  { content: CombinedLaw },
 ];
