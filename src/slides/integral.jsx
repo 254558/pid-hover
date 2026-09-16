@@ -1,6 +1,7 @@
 import ActionWord from '../components/ActionWord';
 import BalanceDemo from '../components/BalanceDemo';
 import Formula from '../components/Formula';
+import Fraction from '../components/Fraction';
 import WindHover from '../components/WindHover';
 import { offset, pid } from './curves';
 
@@ -26,6 +27,21 @@ const FullLaw = () => (
   <Formula className="formula--law">P × 偏差 + I × 偏差之和 + D × 误差的变化率</Formula>
 );
 
+// 上一页那句话说完，这一页给同一个式子的符号写法 —— 讲课时能写在黑板上的那一条。
+// u(t) 是算出来的推力，e(t) 是误差，K 是三个自己调的系数，下标 p / i / d 就是上面三页。
+// 求导项写成真正的分数（Fraction 那个组件），因为「误差的变化率」= de/dt 正是 D 那一页的结论。
+// 字号跟前一页守同一条规则（0.85），两页连着翻字号一样 —— 它们是同一个式子的两种写法。
+// 底下那行小字是符号对照表：u / e / K 三个字母各是什么，跟公式从左到右同序。
+const MathLaw = () => (
+  <>
+    <Formula className="formula--math">
+      u(t) = K<sub>p</sub> e(t) + K<sub>i</sub> ∫e(t)dt + K<sub>d</sub>{' '}
+      <Fraction num="de(t)" den="dt" />
+    </Formula>
+    <div className="t-sm">u 是要给的推力，e 是误差，K 是三个自己调的系数</div>
+  </>
+);
+
 const DynamicAccum = () => (
   <>
     <div className="t-big">由于风是随机的</div>
@@ -40,4 +56,5 @@ export default [
   { content: WindHold },
   { content: DynamicAccum },
   { content: FullLaw, backdrop: pid },
+  { content: MathLaw, backdrop: pid },
 ];

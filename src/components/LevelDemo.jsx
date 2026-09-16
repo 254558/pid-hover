@@ -13,8 +13,9 @@
 //
 // 12° 是屏幕角度，也是这条时间线的幅度（和水平仪那页的黄线同一个数）。
 // 时间线写在 components.css：慢慢歪到 +12°、停一会儿、回平、再往另一边 -12°、再回平，8 秒一轮。
-// 左下角那个「停不住 / 停得住」是判断的输出：歪着的时候说停不住，法线落回来就说停得住。
-// 两个词叠在同一个位置交叉淡入淡出，眼睛就一直钉在那一处。
+// 画布上不写「停不住 / 停得住」这种结论 —— 板歪没歪、法线有没有落回重力那条线，一眼就看得出来，
+// 判断留给讲的人说。前一版在左下角常驻过那两个词，交叉淡入淡出跟着时间线走，现在整块删了。
+// 所以画面里只剩两样东西：不动的参照（蓝）、动的机体（黄）。
 export default function LevelDemo() {
   return (
     <div className="hz">
@@ -43,12 +44,6 @@ export default function LevelDemo() {
             <path className="hz-norm-head" d="M450,88 L470,88 L460,68 Z" />
             <text className="hz-tag hz-tag--y" x="478" y="104" dominantBaseline="central">法线</text>
           </g>
-
-          {/* 判断的结果。歪着的时候没有别的字落在这一角，法线落回来的时候它是竖的、也够不着
-              （x 最远到 240），所以这两个词放在左下角是空的，可以常驻。三个字比原来的两个
-              字宽一点（居中在 x=170，左右各到 50 和 290），那一角仍然装得下。 */}
-          <text className="hz-verdict hz-no" x="170" y="380" textAnchor="middle" dominantBaseline="central">停不住</text>
-          <text className="hz-verdict hz-ok" x="170" y="380" textAnchor="middle" dominantBaseline="central">停得住</text>
         </svg>
       </div>
     </div>

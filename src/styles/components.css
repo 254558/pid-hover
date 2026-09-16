@@ -20,9 +20,14 @@
   margin-bottom:6px;
 }
 
-/* 公式一律不换行：字号被屏幕宽度卡住，系数按“最宽那一段刚好放得下还得留点余量”定 */
+/* 公式一律不换行：字号被屏幕宽度卡住，系数按“最宽那一段刚好放得下还得留点余量”定。
+   字体栈里 'Menlo' 那一支不是备用的备用的：JetBrains Mono 没有 ∫（积分号）和 →（箭头），
+   这两个符号会往下一支掉。48.96px 下量过：掉到系统兜底字体上的 ∫ 只有 13.4px 宽，
+   墨迹却伸到 23.4px —— 会盖在后面的字上；Menlo 的 ∫ 正好一格宽（29.5px），→ 是 0.602em
+   （26.98px 对 26.88px 一格），两个都是正经字形，等宽的节奏也不乱。
+   后面几支是给没装 Menlo 的机器兜底（DejaVu Sans Mono、Consolas 都有这两个字符）。 */
 .formula {
-  font-family:'JetBrains Mono',monospace;
+  font-family:'JetBrains Mono','Menlo','DejaVu Sans Mono','Consolas',monospace;
   font-size:clamp(1.9rem,4.5vw,calc(2.8rem * var(--k))); color:var(--white);
   white-space:nowrap;
   padding:12px 0;
@@ -34,14 +39,29 @@
   font-size:calc(1rem * var(--k)); color:var(--muted);
   display:block; margin-bottom:8px; letter-spacing:0.15em;
 }
-/* 最后一页那条「全式」比别的公式长一大截：把 D 那一项从「角速度」改成「误差的变化率」之后，
+/* 收尾那两页的「全式」比别的公式长一大截：把 D 那一项从「角速度」改成「误差的变化率」之后，
    1280 宽下量出来要 1313px，而栏宽只有 1200px —— 公式是 nowrap，多出来的会被画框裁掉。
-   所以只让这一条小一档（0.85 倍）。为什么不拆成两行、也不改全局字号：前者会改掉这页的
-   版式轮廓（别页都是一行居中），后者会把本来放得下的 P 页、D 页一起缩小。
+   所以只让这两条小一档（0.85 倍）：中文那页（--law）和它的符号版（--math）守同一个字号，
+   两页连着翻就是同一个式子换了一种写法，字号不一样反而像两件事。
+   为什么不拆成两行、也不改全局字号：前者会改掉这两页的版式轮廓（别页都是一行居中），
+   后者会把本来放得下的 P 页、D 页一起缩小。
    0.85 是按留出余量定的：1313 × 0.85 = 1116px，栏宽 1200px，还剩 84px。
+   符号那页同样放不下满号的：折算回去是 1286px，也过 1200px 这条线，所以这两页确实都得收
+   （收完量出来 1093px，左右各留 52 和 54px）。两页的宽度也正好在一个量级，翻页不会一跳一跳。
    窄屏两档在 responsive.css 里跟着重写（那条必须写在那边：responsive 最后加载，
    同等优先级下它的 .formula 会盖掉这里）。 */
-.formula--law { font-size:calc(clamp(1.9rem,4.5vw,calc(2.8rem * var(--k))) * 0.85); }
+.formula--law,
+.formula--math { font-size:calc(clamp(1.9rem,4.5vw,calc(2.8rem * var(--k))) * 0.85); }
+
+/* 符号公式（最后一页）里的下标：K 右下角那个 p / i / d。默认的 <sub> 是 font-size:smaller
+   （0.83 倍）加下沉，在 49px 的等宽行里还是太大、又会被行高挤着走；写死 0.62em 并
+   position 挪下去 0.32em —— 用相对定位而不是 vertical-align，才不会把这一行撑高。
+   注意 0.32em 是按下标自己的字号算的（0.62 × 48.96 = 30.4px，所以实际下沉 9.7px，
+   相对正文是 0.2em）：再浅一点下标就整块浮在基线上头，不像下标了。 */
+.formula sub {
+  font-size:0.62em; vertical-align:baseline;
+  position:relative; bottom:-0.32em; letter-spacing:0;
+}
 
 .formula-big {
   font-family:'JetBrains Mono',monospace;
@@ -61,11 +81,15 @@
 .formula-big > * { flex:none; }
 .slide.active .formula-big { opacity:1; transform:none; }
 
+/* 分式：分子在上、分母在下，中间那条横线是分子的下边框。窄屏那档公式会打开换行
+   （.formula 从 nowrap 变 normal，见 responsive.css），所以这里自己写死 nowrap ——
+   de(t) 和 dt 之间不能断，断了这个分数就散成两半了 */
 .frac {
   display:inline-flex;
   flex-direction:column;
   align-items:center;
   vertical-align:middle;
+  white-space:nowrap;
   line-height:1.2;
   margin:0 2px;
 }
@@ -84,7 +108,7 @@
 }
 .role:last-child { border-bottom:none; }
 .role-l {
-  font-family:'JetBrains Mono',monospace;
+  font-family:'JetBrains Mono','Menlo','DejaVu Sans Mono','Consolas',monospace;
   font-size:calc(1.1rem * var(--k)); font-weight:700;
   color:var(--white); min-width:230px;
   letter-spacing:0.05em;
@@ -290,13 +314,11 @@
    cubic-bezier(.5,0,.5,1) —— 动作的脾气一样，眼睛认得出是同一只手做出来的。
    12° 是屏幕角度：板的两头各走 ±58px、法线尖走 ±34px，看得见，又甩不出画布。
    板长 560、法线 164、弧半径 118 都是在 920×440 里量过的：板两头最高 y=192、
-   最低 y=308；法线尖最高 y=68，重力轴从 y=46 起，撞不上；左下角那块空地
-   （x<300、y>340）全程没有任何东西经过 —— 判断结果就写在那儿。
+   最低 y=308；法线尖最高 y=68，重力轴从 y=46 起，撞不上。左下角那块空地
+   （x<300、y>340）全程没有任何东西经过，留着当留白。
 
-   「停得住 / 停不住」三个字叠在同一处交叉淡入淡出，用的是线性淡、不是缓动：前 9% 还停得住，
-   12.5% 就换成停不住（这时板刚歪到 4.5°，肉眼看不出提前）。停得住的两个窗口
-   48.75–58.75% 和 97.5–100% 跟时间线里回平的两次停顿对齐 —— 所以「停得住」亮起来的时候，
-   法线正好落在重力那条线上，不是差不多，是同一下。
+   这里没有判断结果那一行字（曾经在左下角写过「停不住 / 停得住」，跟着时间线交叉淡入淡出）：
+   板歪没歪一眼看得出，页上不写结论，由讲的人说。所以时间线只剩两条 —— 板转、弧跟着转。
 
    弧的 d 得跟着转：一头钉在竖直上、另一头画到法线上。办法是让 sweep 标志恒为 1
    （SVG 里正角方向 = 屏幕上的顺时针），只让端点动 —— 往右歪时起点是竖直、终点是法线；
@@ -335,16 +357,8 @@
 .hz-tag { font-size:26px; fill:var(--muted); letter-spacing:0.12em; }
 .hz-tag--y { fill:var(--yellow); opacity:0.85; }
 
-/* 判断结果：32px 比小标签大一档。它是这一页唯一要读的东西，不能跟标注一个分量。
-   亮的那一下给到 0.95：蓝天生比原来的纯绿暗，压到 0.85 就看不出「亮起来了」 */
-.hz-verdict { font-size:32px; letter-spacing:0.12em; opacity:0; }
-.hz-ok { fill:var(--blue); }
-.hz-no { fill:var(--text); }
-
 .slide.active .hz-plane { animation:hz-tilt 8s cubic-bezier(.5,0,.5,1) both; }
 .slide.active .hz-arc { animation:hz-arc 8s cubic-bezier(.5,0,.5,1) both; }
-.slide.active .hz-ok { animation:hz-ok 8s linear both; }
-.slide.active .hz-no { animation:hz-no 8s linear both; }
 
 @keyframes hz-tilt {
   0%, 10% { transform:rotate(0deg); }
@@ -359,20 +373,6 @@
   48.75%, 58.75% { d:path("M460,132 A118,118 0 0 1 460,132"); }
   71.25%, 85% { d:path("M435.47,134.58 A118,118 0 0 1 460,132"); }
   97.5%, 100% { d:path("M460,132 A118,118 0 0 1 460,132"); }
-}
-@keyframes hz-ok {
-  0%, 9% { opacity:0.95; }
-  12.5%, 46% { opacity:0; }
-  48.75%, 60% { opacity:0.95; }
-  64%, 95% { opacity:0; }
-  97.5%, 100% { opacity:0.95; }
-}
-@keyframes hz-no {
-  0%, 9% { opacity:0; }
-  12.5%, 46% { opacity:0.7; }
-  48.75%, 60% { opacity:0; }
-  64%, 95% { opacity:0.7; }
-  97.5%, 100% { opacity:0; }
 }
 
 /* 有风那页（WindHover）的图。跟 LevelDemo 是一对：同一块 920×440 画布、同一套颜色和字号，
