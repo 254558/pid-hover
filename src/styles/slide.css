@@ -38,6 +38,11 @@
 
 .t-xl { font-size:calc(4.3rem * var(--k)); font-weight:900; line-height:1.3; color:var(--white); letter-spacing:-0.01em; }
 .t-xl--sm { font-size:calc(3.2rem * var(--k)); }
+/* 下面这三个目前没有页面在用（grep 一下 .t-hero / .t-mid / .t-eyebrow 就知道）：
+   全是早期版式留下的档位，现在各页的大字都收敛到 .t-xl / .t-big / .t-sm 三档。
+   留着是因为它们各自有个别处没有的写法 —— .t-hero 是唯一的负字距 900 字重，
+   .t-mid 是 1.9 的大行距正文，.t-eyebrow 是纯字距（要配别的字号用，本身不带 size）；
+   真要加一页特殊版式的时候不用重敲。responsive.css 里那两条重写同理。 */
 .t-hero { font-size:calc(4.8rem * var(--k)); font-weight:900; color:var(--white); letter-spacing:-0.02em; }
 .t-big { font-size:calc(2.6rem * var(--k)); font-weight:700; line-height:1.7; color:var(--text); }
 /* 给「大字底下还挂着一大块画布」的页面用，收 0.85。动画那页（LevelDemo）和有风那页

@@ -10,6 +10,9 @@
 }
 .act-word .first { font-size:calc(9.5rem * var(--k)); letter-spacing:-0.02em; }
 .act-word .rest { font-size:calc(2.4rem * var(--k)); letter-spacing:0.08em; opacity:0.25; }
+/* 没有页面在用（.act-word 上加 pid 的那个变体，见 ActionWord.jsx 的说明）：
+   藏掉后面的字母、把首字母放到 6.8rem —— 三页现在是首字母 + 后面的字母一起排，
+   走的是上面那两条。窄屏那一档对应的那条重写也别删，一起留着。 */
 .act-word.pid .first { font-size:calc(6.8rem * var(--k)); letter-spacing:0.12em; }
 .act-word.pid .rest  { display:none; }
 
@@ -48,8 +51,15 @@
    0.85 是按留出余量定的：1313 × 0.85 = 1116px，栏宽 1200px，还剩 84px。
    符号那页同样放不下满号的：折算回去是 1286px，也过 1200px 这条线，所以这两页确实都得收
    （收完量出来 1093px，左右各留 52 和 54px）。两页的宽度也正好在一个量级，翻页不会一跳一跳。
-   窄屏两档在 responsive.css 里跟着重写（那条必须写在那边：responsive 最后加载，
-   同等优先级下它的 .formula 会盖掉这里）。 */
+   窄屏得另说，两档不一样（那两条必须写在 responsive.css：它最后加载，同等优先级下
+   它的 .formula 会盖掉这里）：
+   · 769–1199 那一档照比例重写了这两条（.formula 4rem / --law、--math 3.4rem，还是 0.85），
+     桌面这一条的意图保住了；
+   · 手机那一档只有 .formula{font-size:1.9rem;white-space:normal}，没有跟着重写 --law/--math，
+     所以那里 0.85 是被盖掉的，这两页按 1.9rem 排（量过，就是 30.4px）。
+     这不是问题：那一档公式本来就放开了换行，最长的两条会折成两行，量过不溢出。
+     之所以不去补一条重写：手机上是 1.9rem 还是 1.62rem 已经看不出区别，多一条规则
+     反而多一个要跟着 --k 走的地方。 */
 .formula--law,
 .formula--math { font-size:calc(clamp(1.9rem,4.5vw,calc(2.8rem * var(--k))) * 0.85); }
 
@@ -63,6 +73,9 @@
   position:relative; bottom:-0.32em; letter-spacing:0;
 }
 
+/* 多段公式用的排法（每段可以单独占一格、能挂 label），目前没有页面在用 —— 现在三页公式
+   都是一行 nowrap（.formula），留在这里是因为它是唯一能排「公式中间夹中文」的机制，
+   要加那种页时不必重写。同理 responsive.css 里那两条重写也别删。 */
 .formula-big {
   font-family:'JetBrains Mono',monospace;
   font-size:clamp(1.9rem,4.5vw,calc(3.2rem * var(--k))); color:var(--white);
@@ -101,21 +114,6 @@
   padding:3px 4px 0;
 }
 
-.roles { margin:14px auto; text-align:left; max-width:900px; }
-.role {
-  display:flex; align-items:baseline; gap:14px;
-  padding:6px 0; border-bottom:1px solid var(--border);
-}
-.role:last-child { border-bottom:none; }
-.role-l {
-  font-family:'JetBrains Mono','Menlo','DejaVu Sans Mono','Consolas',monospace;
-  font-size:calc(1.1rem * var(--k)); font-weight:700;
-  color:var(--white); min-width:230px;
-  letter-spacing:0.05em;
-}
-.role-t { font-size:calc(1.4rem * var(--k)); color:var(--text); }
-.role-s { font-size:calc(1.1rem * var(--k)); color:var(--muted); margin-left:3px; }
-
 .curve-wrap {
   position:absolute;
   inset:0;
@@ -146,35 +144,6 @@
   stroke-width:1.5;
   opacity:0.9;
 }
-/* 水平仪那页的支点：水平线和当前角度那条线的交点，也就是角度的顶点。
-   没有这个点，两条直线交叉会读成「画了两条线」；有了它才看得出是绕着一个点在歪。
-   跟水平线同一个蓝、同一档透明度（那页的虚线用的就是 .c-lvl），算一套参照物；
-   填充要显式关掉，SVG 的 circle 默认是黑填充，会变成一个黑点。 */
-.curve-wrap .c-pivot {
-  fill:none;
-  stroke:var(--blue);
-  stroke-width:1;
-  opacity:0.5;
-}
-/* 标角度用的那段弧，和水平线、支点同一套（蓝、细、0.5）—— 它们仨合起来是「参照物」这一族，
-   黄线才是被测的那条。弧本身很短（弦长 66px），看着接近直线，但它接的两头分别是水平方向
-   和 12° 方向，一眼能看出标的是哪一个角。 */
-.curve-wrap .c-arc {
-  fill:none;
-  stroke:var(--blue);
-  stroke-width:1;
-  opacity:0.5;
-}
-/* 角度的读数。比那三条蓝线亮一档（0.8）：它是这页唯一要「读」的东西，0.5 就太虚了；
-   但也不给满，免得比正文还响。用等宽体，跟公式页的观感一致。
-   font-size 写 20 是 viewBox 单位 —— 竖着会乘 1.2 渲染成 24px，所以别照桌面字号去估。 */
-.curve-wrap .c-deg {
-  fill:var(--blue);
-  font-family:'JetBrains Mono',monospace;
-  font-size:20px;
-  opacity:0.8;
-}
-
 /* 鼠标视差：只挂在有曲线的页面。曲线是自己一层（.curve-wrap），正文是自己一层（.s），
    两边各挂一个跟指针位置挂钩的位移，幅度和方向都不一样，于是鼠标一动，两层就错开。
 
@@ -202,11 +171,23 @@
   will-change: transform;
 }
 
-/* 「动态攒偏差」那页的天平动画。920×300 是画布，窄屏在 responsive.css 里整块缩放。
-   一条 7.4 秒的时间线（秒 → 百分比，写在下面的百分比里）：0.5 左边吹下来，梁歪 -7°，
-   方块往右挪 130 抵消，2.6 梁平；3.0 右边吹下来，+6°，方块挪到 -50，5.1 梁平；
-   5.5 右边往上吹，-3.5°，方块挪回 +40，7.1 梁平。全部挂在
-   .slide.active 下，翻到这一页才播。方块离中点多远，就是攒下来的偏差之和。 */
+/* 「动态攒误差」那页的天平动画。920×300 是画布，窄屏在 responsive.css 里整块缩放。
+
+   一条 8 秒的循环（秒 → 百分比，写在下面的百分比里）：0.4 左边吹下来，梁歪 -7°，
+   方块往右挪 130 抵消，2.6 梁平；2.9 右边吹下来，+6°，方块挪到 -50，5.1 梁平；
+   5.4 右边往上吹，-3.5°，方块挪回 +40，7.2 梁平；7.5 风停了，方块滑回中点，
+   8.0 回到起点 —— 首尾是同一个状态（梁平、方块在中间、三个风箭头都看不见），
+   所以 infinite 接得上，不会跳。
+
+   这一页是整份 deck 里唯一循环播放的叙事动画：别的页（法线、有风、曲线）演一遍就停在终态，
+   而这一页要讲的是「风是随机的，误差得一直累加」—— 演完一遍就停住，等于说这事有完，
+   所以它必须一直转下去。方块滑回中点那一小段是「误差之和归零、位置守住了」，
+   也是整份 deck 的终点（悬停），放在循环的接缝处正合适。
+   （有风那页的风箭头也是 infinite，但那只是三支箭头明暗呼吸，没有时间线；
+   这一页是唯一一条「有事发生、有结果」的循环。）
+
+   全部挂在 .slide.active 下，翻到这一页才起播；翻走再翻回来会从头开始。
+   方块离中点多远，就是攒下来的误差之和。 */
 .bal { position:relative; width:920px; max-width:100%; height:300px; margin:26px auto 0; }
 .bal-stage {
   position:absolute; top:0; left:50%;
@@ -252,7 +233,7 @@
 .bal-gust--b { left:824px; top:44px; }
 .bal-gust--c { left:824px; top:184px; }
 
-/* 方块离中点的那段距离 = 偏差之和（往右为正、往左为负） */
+/* 方块离中点的那段距离 = 误差之和（往右为正、往左为负） */
 .bal-tick { position:absolute; left:459px; top:192px; width:2px; height:18px; background:var(--line); }
 .bal-dim { position:absolute; top:200px; height:2px; background:var(--muted); }
 .bal-sum-tag {
@@ -260,49 +241,58 @@
   font-size:26px; color:var(--muted); letter-spacing:0.12em; white-space:nowrap;
 }
 
-.slide.active .bal-beam { animation:bal-tilt 7.4s cubic-bezier(.5,0,.5,1) both; }
-.slide.active .bal-block { animation:bal-slide 7.4s cubic-bezier(.5,0,.5,1) both; }
-.slide.active .bal-dim { animation:bal-measure 7.4s cubic-bezier(.5,0,.5,1) both; }
-.slide.active .bal-gust--a { animation:bal-gust-a 7.4s linear both; }
-.slide.active .bal-gust--b { animation:bal-gust-b 7.4s linear both; }
-.slide.active .bal-gust--c { animation:bal-gust-c 7.4s linear both; }
+.slide.active .bal-beam { animation:bal-tilt 8s cubic-bezier(.5,0,.5,1) infinite; }
+.slide.active .bal-block { animation:bal-slide 8s cubic-bezier(.5,0,.5,1) infinite; }
+.slide.active .bal-dim { animation:bal-measure 8s cubic-bezier(.5,0,.5,1) infinite; }
+.slide.active .bal-gust--a { animation:bal-gust-a 8s linear infinite; }
+.slide.active .bal-gust--b { animation:bal-gust-b 8s linear infinite; }
+.slide.active .bal-gust--c { animation:bal-gust-c 8s linear infinite; }
 
-/* 梁歪 → 方块往反方向挪 → 梁回平；歪得越少挪得越慢 */
+/* 梁歪 → 方块往反方向挪 → 梁回平；歪得越少挪得越慢。
+   注意每条的首尾必须落在同一个值上（梁 0°、方块 0），i-n-f-i-n-i-t-e 才接得住 ——
+   改这里的百分比时，100% 那一帧不能省。 */
 @keyframes bal-tilt {
-  0%, 6.8% { transform:rotate(0deg); }
-  14.9% { transform:rotate(-7deg); }
-  35.1%, 40.5% { transform:rotate(0deg); }
-  48.6% { transform:rotate(6deg); }
-  68.9%, 74.3% { transform:rotate(0deg); }
-  79.7% { transform:rotate(-3.5deg); }
-  95.9%, 100% { transform:rotate(0deg); }
+  0%, 5% { transform:rotate(0deg); }
+  13.75% { transform:rotate(-7deg); }
+  32.5%, 36.25% { transform:rotate(0deg); }
+  45% { transform:rotate(6deg); }
+  63.75%, 67.5% { transform:rotate(0deg); }
+  76.25% { transform:rotate(-3.5deg); }
+  90%, 100% { transform:rotate(0deg); }
 }
+/* 方块：梁在歪的这段时间里它不动（风刚来，还没来得及补），梁回平的这段时间它在挪 ——
+   挪到位的那一刻正好是梁回到水平的那一刻。最后一段是风停之后滑回中点。 */
 @keyframes bal-slide {
-  0%, 14.9% { transform:translateX(0); }
-  35.1%, 48.6% { transform:translateX(130px); }
-  68.9%, 79.7% { transform:translateX(-50px); }
-  95.9%, 100% { transform:translateX(40px); }
+  0%, 13.75% { transform:translateX(0); }
+  32.5%, 36.25% { transform:translateX(130px); }
+  63.75%, 76.25% { transform:translateX(-50px); }
+  90%, 93.75% { transform:translateX(40px); }
+  100% { transform:translateX(0); }
 }
+/* 标注线量的是方块离开中点的距离：方块在右边就从中心往右量（left 不动、只有宽度），
+   在左边就从方块量到中心（left = 460 − 距离）。方向靠 left 换，长度靠 width */
 @keyframes bal-measure {
-  0%, 14.9% { left:460px; width:0; }
-  35.1%, 48.6% { left:460px; width:130px; }
-  68.9%, 79.7% { left:410px; width:50px; }
-  95.9%, 100% { left:460px; width:40px; }
+  0%, 13.75% { left:460px; width:0; }
+  32.5%, 36.25% { left:460px; width:130px; }
+  63.75%, 76.25% { left:410px; width:50px; }
+  90%, 93.75% { left:460px; width:40px; }
+  100% { left:460px; width:0; }
 }
+/* 三个风箭头：各自亮一段，错开。它们也是循环的一部分，所以 100% 那帧必须是 0（看不见） */
 @keyframes bal-gust-a {
-  0%, 4% { opacity:0; }
-  6.8%, 32% { opacity:0.9; }
-  38%, 100% { opacity:0; }
+  0%, 3% { opacity:0; }
+  5%, 29% { opacity:0.9; }
+  34%, 100% { opacity:0; }
 }
 @keyframes bal-gust-b {
-  0%, 38% { opacity:0; }
-  40.5%, 66% { opacity:0.9; }
-  72%, 100% { opacity:0; }
+  0%, 34% { opacity:0; }
+  37%, 58% { opacity:0.9; }
+  63%, 100% { opacity:0; }
 }
 @keyframes bal-gust-c {
-  0%, 71% { opacity:0; }
-  74.3%, 92% { opacity:0.9; }
-  97%, 100% { opacity:0; }
+  0%, 64% { opacity:0; }
+  68%, 83% { opacity:0.9; }
+  88%, 100% { opacity:0; }
 }
 
 /* 「无人机怎么判断一个平面是否水平」那页的动画。920×440 是画布 —— 比天平那页高，
@@ -341,7 +331,8 @@
    线是 0.5、它得再亮一档才看得出那个朝下 */
 .hz-grav { fill:none; stroke:var(--blue); stroke-width:1; stroke-dasharray:2 8; opacity:0.5; }
 .hz-head { fill:var(--blue); opacity:0.65; }
-/* 夹角的弧：跟水平仪那页同一种蓝、同一个 0.5。它是个读数，不是主体 */
+/* 夹角的弧：跟这一页另外两条参照线（水平面、重力轴）同一种蓝、同一个 0.5，
+   它们三个合起来是「参照物」这一族。弧是读数，不是主体 */
 .hz-arc { fill:none; stroke:var(--blue); stroke-width:1; opacity:0.5; }
 
 /* 机体面 + 法线：黄=实际姿态、蓝=参照，跟曲线页一个规矩。transform-box 写死 view-box，
@@ -352,7 +343,8 @@
 .hz-norm { fill:none; stroke:var(--yellow); stroke-width:1.5; opacity:0.9; }
 .hz-norm-head { fill:var(--yellow); opacity:0.9; }
 
-/* 小标签统一 26px、--muted、0.12em，跟天平那页的「停住了」「偏差之和」同规格。
+/* 小标签统一 26px、--muted、0.12em，跟天平那页的「停住了」「误差之和」同规格。
+   （有风那页的源数也是 26，但那页视窗收窄、整图放大 1.212 倍，渲染出来是 31.5px。）
    「法线」是黄的而且跟着板一起转 —— 它标的就是那根箭头，不跟着转就不算它的标签 */
 .hz-tag { font-size:26px; fill:var(--muted); letter-spacing:0.12em; }
 .hz-tag--y { fill:var(--yellow); opacity:0.85; }
@@ -375,7 +367,7 @@
   97.5%, 100% { d:path("M460,132 A118,118 0 0 1 460,132"); }
 }
 
-/* 有风那页（WindHover）的图。跟 LevelDemo 是一对：同一块 920×440 画布、同一套颜色和字号，
+/* 有风那页（WindHover）的图。跟 LevelDemo 是一对：同一块 920×440 画布、同一套颜色，
    差别只在多出来的风和平行四边形。
    坐标都按「机体中心 = (470,268)」摆，四个点就是一个平行四边形：中心 (470,268)、重力箭尖
    (470,372)、推力箭尖 (432,164)、合力箭尖 (432,268)。重力往下 104、推力斜着 110.72，两条是
@@ -388,9 +380,9 @@
    组内是竖直的，这样「推力垂直于板」是构造出来的，不用手算箭头。
    标签位置是量过的：重力(486,382)、风的阻力(524,292)、合力(420,246 右对齐)、推力(404,148
    右对齐)、风(64,96)，互相不压、也不压到斜过来的板（板两头是 (263.4,343.5) 和 (676.6,192.5)）。
-   那道弧半径 76、从竖直画到推力（sweep 0 = 逆时针 = 往左偏），和上一页的弧同一种画法。
-   图自己只占 x 64..677（风的尾巴到板的最右端），所以 svg 的 viewBox 起点写在 -90 而不是 0：
-   视窗往左挪 90px，图在 920 宽里就居中了，图里的坐标一个都没动。 */
+   图自己的墨迹占 x −36..678、y 78..401（风那一组在 svg 里 translate(-100)，所以 64 变成 −36），
+   视窗就是照这个范围四周留 20～23 裁出来的 759×363 —— 比例仍是 920:440，于是 920×440 的画布
+   把整张图等比放大 1.212 倍铺满。字号写在下面的 .wh-tag 里，26 这个数没动，渲染出来是 31.5px。 */
 .wh { position:relative; width:920px; max-width:100%; height:440px; margin:26px auto 0; }
 .wh-stage {
   position:absolute; top:0; left:50%;
@@ -409,8 +401,7 @@
 /* 重力：跟上一页同一支蓝、同一条点线、同一个 0.5；箭头 0.65 */
 .wh-grav { fill:none; stroke:var(--blue); stroke-width:1; stroke-dasharray:2 8; opacity:0.5; }
 .wh-grav-head { fill:var(--blue); opacity:0.65; }
-/* 夹角弧：也是上一页那一种 */
-.wh-arc { fill:none; stroke:var(--blue); stroke-width:1; opacity:0.5; }
+/* 这里曾经有一条 .wh-arc（夹角弧，照上一页搬过来的），删了：理由写在 WindHover.jsx 顶部 */
 
 /* 平行四边形的两条辅助边：细虚线、没有箭头 —— 没有箭头就不是力，是画图用的线。
    颜色跟着它复制的那条边：黄的那条平行于推力，蓝的那条平行于重力 */
@@ -435,7 +426,8 @@
 .wh-thrust { fill:none; stroke:var(--yellow); stroke-width:1.5; opacity:0.9; }
 .wh-thrust-head { fill:var(--yellow); opacity:0.9; }
 
-/* 标签：26px --muted、0.12em，跟上一页和天平那页同一规格。「推力」是黄的 ——
+/* 标签：26px --muted、0.12em，源数跟上一页和天平那页同一规格（这一页的视窗收窄了，实际渲染
+   31.5px，见上面 .wh 那段的说明，是唯一一处不等的地方）。「推力」是黄的 ——
    它标的就是那根黄箭头，跟「法线」在上一页的待遇一样 */
 .wh-tag { font-size:26px; fill:var(--muted); letter-spacing:0.12em; }
 .wh-tag--y { fill:var(--yellow); opacity:0.85; }
