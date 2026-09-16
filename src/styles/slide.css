@@ -40,6 +40,11 @@
 .t-xl--sm { font-size:calc(3.2rem * var(--k)); }
 .t-hero { font-size:calc(4.8rem * var(--k)); font-weight:900; color:var(--white); letter-spacing:-0.02em; }
 .t-big { font-size:calc(2.6rem * var(--k)); font-weight:700; line-height:1.7; color:var(--text); }
+/* 给「大字底下还挂着一大块画布」的页面用，收 0.85。动画那页（LevelDemo）和有风那页
+   （WindHover）都在用：一行 2.6rem 加 920×440 的画布一共 607px，只剩 45px 余量，字压得离
+   画布太近；收到 0.85 之后正文 120px、整页 586px，画布上头的空就够呼吸了。
+   窄屏档在 responsive.css 里跟着 .t-big 一起重写（那一档的字号表是写死的）。 */
+.t-big--sm { font-size:calc(2.6rem * var(--k) * 0.85); }
 .t-mid { font-size:calc(1.75rem * var(--k)); line-height:1.9; color:var(--text); }
 .t-sm { font-size:calc(1.25rem * var(--k)); color:var(--muted); line-height:1.8; }
 .t-eyebrow { letter-spacing:0.1em; }

@@ -101,16 +101,16 @@
 }
 .slide.active .curve-wrap { opacity:1; }
 .curve-wrap svg { width:100%; height:100%; }
-/* y=285 那条水平的「平了」参考线。以前一直没画出来，曲线停在哪儿全靠脑补；
-   有了它，「停在线上」和「停在下方一截不动了」才分得出来。绿对黄，一眼分得清哪条是目标、
-   哪条是实际走的；0.4 的绿压在近黑底上算出来约 rgb(4,106,4)，亮度只有莫兰迪黄曲线的
-   三分之一，看得见但不跟曲线抢。 */
+/* y=285 那条水平的「停住」参考线。以前一直没画出来，曲线停在哪儿全靠脑补；
+   有了它，「停在线上」和「停在下方一截不动了」才分得出来。蓝对黄，色相差 160°，一眼
+   分得清哪条是目标、哪条是实际走的；0.5 的蓝压在近黑底上算出来约 rgb(72,89,106)，
+   相对亮度约莫兰迪黄曲线的四分之一，看得见但不跟曲线抢（为什么是 0.5 见 base.css）。 */
 .curve-wrap .c-lvl {
   fill:none;
-  stroke:var(--green);
+  stroke:var(--blue);
   stroke-width:1;
   stroke-dasharray:9 11;
-  opacity:0.4;
+  opacity:0.5;
 }
 /* 曲线：整份 deck 里唯一一处彩色。原来是一道 0.12 的白，几乎是隐形的；
    现在它得真被看见 —— 颜色压在近黑底上，透明度太低会变成一坨发暗的橄榄色，
@@ -121,6 +121,34 @@
   stroke:var(--yellow);
   stroke-width:1.5;
   opacity:0.9;
+}
+/* 水平仪那页的支点：水平线和当前角度那条线的交点，也就是角度的顶点。
+   没有这个点，两条直线交叉会读成「画了两条线」；有了它才看得出是绕着一个点在歪。
+   跟水平线同一个蓝、同一档透明度（那页的虚线用的就是 .c-lvl），算一套参照物；
+   填充要显式关掉，SVG 的 circle 默认是黑填充，会变成一个黑点。 */
+.curve-wrap .c-pivot {
+  fill:none;
+  stroke:var(--blue);
+  stroke-width:1;
+  opacity:0.5;
+}
+/* 标角度用的那段弧，和水平线、支点同一套（蓝、细、0.5）—— 它们仨合起来是「参照物」这一族，
+   黄线才是被测的那条。弧本身很短（弦长 66px），看着接近直线，但它接的两头分别是水平方向
+   和 12° 方向，一眼能看出标的是哪一个角。 */
+.curve-wrap .c-arc {
+  fill:none;
+  stroke:var(--blue);
+  stroke-width:1;
+  opacity:0.5;
+}
+/* 角度的读数。比那三条蓝线亮一档（0.8）：它是这页唯一要「读」的东西，0.5 就太虚了；
+   但也不给满，免得比正文还响。用等宽体，跟公式页的观感一致。
+   font-size 写 20 是 viewBox 单位 —— 竖着会乘 1.2 渲染成 24px，所以别照桌面字号去估。 */
+.curve-wrap .c-deg {
+  fill:var(--blue);
+  font-family:'JetBrains Mono',monospace;
+  font-size:20px;
+  opacity:0.8;
 }
 
 /* 鼠标视差：只挂在有曲线的页面。曲线是自己一层（.curve-wrap），正文是自己一层（.s），
@@ -134,7 +162,7 @@
    要做出 50px 的相对位移，正文得甩出去 ±30px，那就没法读了。宁可倒过来。
 
    scale(1.05) 不是装饰：层平移之后，原来贴着视口那一侧的边会缩进来，曲线会凭空断在半路 ——
-   尤其那条绿虚线是横贯全宽的，一眼就能看出少了一截。放大 5%（横向各 32px、纵向各 18px 余量）
+   尤其那条蓝虚线是横贯全宽的，一眼就能看出少了一截。放大 5%（横向各 32px、纵向各 18px 余量）
    之后，±20/±13px 的平移在任何方向上都够用，永远露不出底。
 
    will-change 只给当前这一页：别的页面 opacity 是 0，本来就不画，提升成合成层白占显存；
@@ -163,7 +191,7 @@
   transform-origin:top center;
 }
 
-/* 那条水平的「平了」参考线，梁绕着中点转，线不动，一眼看出歪没歪 */
+/* 那条水平的参考线（标签写「停住了」），梁绕着中点转，线不动，一眼看出歪没歪 */
 .bal-level {
   position:absolute; left:180px; top:132px; width:560px; height:0;
   border-top:2px dashed var(--line);
@@ -251,4 +279,173 @@
   0%, 71% { opacity:0; }
   74.3%, 92% { opacity:0.9; }
   97%, 100% { opacity:0; }
+}
+
+/* 「无人机怎么判断一个平面是否水平」那页的动画。920×440 是画布 —— 比天平那页高，
+   因为法线要能往两边摆开，窄屏在 responsive.css 里整块缩放，跟天平同一套系数。
+
+   一条 8 秒的时间线（秒 → 百分比）：0–0.8 平着不动；0.8–1.8 慢慢歪到 +12°；
+   1.8–2.9 停在 12°；2.9–3.9 回平；3.9–4.7 平着不动；4.7–5.7 往另一边歪到 −12°；
+   5.7–6.8 停住；6.8–7.8 回平；7.8–8.0 平着不动。缓动曲线用的是天平那条
+   cubic-bezier(.5,0,.5,1) —— 动作的脾气一样，眼睛认得出是同一只手做出来的。
+   12° 是屏幕角度：板的两头各走 ±58px、法线尖走 ±34px，看得见，又甩不出画布。
+   板长 560、法线 164、弧半径 118 都是在 920×440 里量过的：板两头最高 y=192、
+   最低 y=308；法线尖最高 y=68，重力轴从 y=46 起，撞不上；左下角那块空地
+   （x<300、y>340）全程没有任何东西经过 —— 判断结果就写在那儿。
+
+   「停得住 / 停不住」三个字叠在同一处交叉淡入淡出，用的是线性淡、不是缓动：前 9% 还停得住，
+   12.5% 就换成停不住（这时板刚歪到 4.5°，肉眼看不出提前）。停得住的两个窗口
+   48.75–58.75% 和 97.5–100% 跟时间线里回平的两次停顿对齐 —— 所以「停得住」亮起来的时候，
+   法线正好落在重力那条线上，不是差不多，是同一下。
+
+   弧的 d 得跟着转：一头钉在竖直上、另一头画到法线上。办法是让 sweep 标志恒为 1
+   （SVG 里正角方向 = 屏幕上的顺时针），只让端点动 —— 往右歪时起点是竖直、终点是法线；
+   往左歪时反过来，起点是法线、终点是竖直。两段的起点差两个数字而已，插值仍然连续，
+   sweep 不用翻，中间不会跳。平的那一刻两端重合，按规范退化的弧不画，正好就是
+   「没有夹角」该有的样子，不用另外去藏它。 */
+.hz { position:relative; width:920px; max-width:100%; height:440px; margin:26px auto 0; }
+.hz-stage {
+  position:absolute; top:0; left:50%;
+  width:920px; height:440px;
+  transform:translateX(-50%);
+  transform-origin:top center;
+}
+.hz svg { display:block; width:100%; height:100%; }
+
+/* 水平面：跟曲线页那条「停住」线同一种画法（蓝虚线 9 11、0.5）。整个 deck 里
+   水平方向的参照只有这一种画法，所以这台动画里那条也得是它 */
+.hz-ref { fill:none; stroke:var(--blue); stroke-width:1; stroke-dasharray:9 11; opacity:0.5; }
+/* 重力轴：点线，比虚线碎，跟水平面那条一眼分得开。箭头给到 0.65 —— 参照里只有它有方向，
+   线是 0.5、它得再亮一档才看得出那个朝下 */
+.hz-grav { fill:none; stroke:var(--blue); stroke-width:1; stroke-dasharray:2 8; opacity:0.5; }
+.hz-head { fill:var(--blue); opacity:0.65; }
+/* 夹角的弧：跟水平仪那页同一种蓝、同一个 0.5。它是个读数，不是主体 */
+.hz-arc { fill:none; stroke:var(--blue); stroke-width:1; opacity:0.5; }
+
+/* 机体面 + 法线：黄=实际姿态、蓝=参照，跟曲线页一个规矩。transform-box 写死 view-box，
+   transform-origin 才按 viewBox 里的坐标 (460,250) 算；不写的话基准是元素自己的包围盒，
+   板一转圆心就跑了 */
+.hz-plane { transform-box:view-box; transform-origin:460px 250px; }
+.hz-slab { fill:var(--yellow); opacity:0.85; }
+.hz-norm { fill:none; stroke:var(--yellow); stroke-width:1.5; opacity:0.9; }
+.hz-norm-head { fill:var(--yellow); opacity:0.9; }
+
+/* 小标签统一 26px、--muted、0.12em，跟天平那页的「停住了」「偏差之和」同规格。
+   「法线」是黄的而且跟着板一起转 —— 它标的就是那根箭头，不跟着转就不算它的标签 */
+.hz-tag { font-size:26px; fill:var(--muted); letter-spacing:0.12em; }
+.hz-tag--y { fill:var(--yellow); opacity:0.85; }
+
+/* 判断结果：32px 比小标签大一档。它是这一页唯一要读的东西，不能跟标注一个分量。
+   亮的那一下给到 0.95：蓝天生比原来的纯绿暗，压到 0.85 就看不出「亮起来了」 */
+.hz-verdict { font-size:32px; letter-spacing:0.12em; opacity:0; }
+.hz-ok { fill:var(--blue); }
+.hz-no { fill:var(--text); }
+
+.slide.active .hz-plane { animation:hz-tilt 8s cubic-bezier(.5,0,.5,1) both; }
+.slide.active .hz-arc { animation:hz-arc 8s cubic-bezier(.5,0,.5,1) both; }
+.slide.active .hz-ok { animation:hz-ok 8s linear both; }
+.slide.active .hz-no { animation:hz-no 8s linear both; }
+
+@keyframes hz-tilt {
+  0%, 10% { transform:rotate(0deg); }
+  22.5%, 36.25% { transform:rotate(12deg); }
+  48.75%, 58.75% { transform:rotate(0deg); }
+  71.25%, 85% { transform:rotate(-12deg); }
+  97.5%, 100% { transform:rotate(0deg); }
+}
+@keyframes hz-arc {
+  0%, 10% { d:path("M460,132 A118,118 0 0 1 460,132"); }
+  22.5%, 36.25% { d:path("M460,132 A118,118 0 0 1 484.53,134.58"); }
+  48.75%, 58.75% { d:path("M460,132 A118,118 0 0 1 460,132"); }
+  71.25%, 85% { d:path("M435.47,134.58 A118,118 0 0 1 460,132"); }
+  97.5%, 100% { d:path("M460,132 A118,118 0 0 1 460,132"); }
+}
+@keyframes hz-ok {
+  0%, 9% { opacity:0.95; }
+  12.5%, 46% { opacity:0; }
+  48.75%, 60% { opacity:0.95; }
+  64%, 95% { opacity:0; }
+  97.5%, 100% { opacity:0.95; }
+}
+@keyframes hz-no {
+  0%, 9% { opacity:0; }
+  12.5%, 46% { opacity:0.7; }
+  48.75%, 60% { opacity:0; }
+  64%, 95% { opacity:0.7; }
+  97.5%, 100% { opacity:0; }
+}
+
+/* 有风那页（WindHover）的图。跟 LevelDemo 是一对：同一块 920×440 画布、同一套颜色和字号，
+   差别只在多出来的风和平行四边形。
+   坐标都按「机体中心 = (470,268)」摆，四个点就是一个平行四边形：中心 (470,268)、重力箭尖
+   (470,372)、推力箭尖 (432,164)、合力箭尖 (432,268)。重力往下 104、推力斜着 110.72，两条是
+   这个四边形的边；两条虚线是另两条边（黄的那条从重力箭尖出发、跟推力同向同长，蓝的那条从
+   推力箭尖出发、跟重力同向同长），四条边两两平行且等长，所以四个点必然共面成一个平行四边形。
+   对角线 = 从中心到 (432,268) 的那根黄箭头：长 38、横着往左，跟往右的「风的阻力」（也是 38）
+   一样长、方向相反 —— 这页要看的就是这一对。它是构造出来的：(432,268) = (470,372)+(432,164)
+   −(470,268)，所以对角线一定落在辅助线的交点上，也一定落在风的阻力的反向延长线上。
+   板跟着转 atan(38/104) = 20.072°，推力画在会转的那一组（.wh-body，绕 470,268 转这个角）里、
+   组内是竖直的，这样「推力垂直于板」是构造出来的，不用手算箭头。
+   标签位置是量过的：重力(486,382)、风的阻力(524,292)、合力(420,246 右对齐)、推力(404,148
+   右对齐)、风(64,96)，互相不压、也不压到斜过来的板（板两头是 (263.4,343.5) 和 (676.6,192.5)）。
+   那道弧半径 76、从竖直画到推力（sweep 0 = 逆时针 = 往左偏），和上一页的弧同一种画法。
+   图自己只占 x 64..677（风的尾巴到板的最右端），所以 svg 的 viewBox 起点写在 -90 而不是 0：
+   视窗往左挪 90px，图在 920 宽里就居中了，图里的坐标一个都没动。 */
+.wh { position:relative; width:920px; max-width:100%; height:440px; margin:26px auto 0; }
+.wh-stage {
+  position:absolute; top:0; left:50%;
+  width:920px; height:440px;
+  transform:translateX(-50%);
+  transform-origin:top center;
+}
+.wh svg { display:block; width:100%; height:100%; }
+
+/* 风：灰的，比黄和蓝都暗一档（0.45 压在近黑底上约 rgb(86,86,86)）—— 它是环境，不是主角。
+   左边那三支会慢慢明暗，飞机那一半一动不动：这就是这一页要说的事 */
+.wh-gust { opacity:0.45; }
+.wh-gust-line { fill:none; stroke:var(--text); stroke-width:1.2; }
+.wh-gust-head { fill:var(--text); }
+
+/* 重力：跟上一页同一支蓝、同一条点线、同一个 0.5；箭头 0.65 */
+.wh-grav { fill:none; stroke:var(--blue); stroke-width:1; stroke-dasharray:2 8; opacity:0.5; }
+.wh-grav-head { fill:var(--blue); opacity:0.65; }
+/* 夹角弧：也是上一页那一种 */
+.wh-arc { fill:none; stroke:var(--blue); stroke-width:1; opacity:0.5; }
+
+/* 平行四边形的两条辅助边：细虚线、没有箭头 —— 没有箭头就不是力，是画图用的线。
+   颜色跟着它复制的那条边：黄的那条平行于推力，蓝的那条平行于重力 */
+.wh-helper { fill:none; stroke-width:1; stroke-dasharray:2 7; }
+.wh-helper--y { stroke:var(--yellow); opacity:0.4; }
+.wh-helper--b { stroke:var(--blue); opacity:0.45; }
+
+/* 合力：平行四边形的对角线，也就是要跟风的阻力对上的那一份。比推力淡一档（0.75 对 0.9），
+   它是重力和推力合出来的，不是第二股推力。粗细跟风的阻力看齐，那一对等长的箭头才立得住 */
+.wh-res { fill:none; stroke:var(--yellow); stroke-width:1.4; opacity:0.75; }
+.wh-res-head { fill:var(--yellow); opacity:0.8; }
+/* 风的阻力：跟风同一支灰。它现在是这页的一号配角（合力就是冲它去的），所以比环境那三支亮 */
+.wh-drag { fill:none; stroke:var(--text); stroke-width:1.4; opacity:0.8; }
+.wh-drag-head { fill:var(--text); opacity:0.85; }
+
+/* 机体的板 + 推力：黄、跟上一页的板和法线同一个透明度（0.85 / 0.9）。
+   transform-box 写死 view-box，转心才按 viewBox 里的 (470,268) 算。
+   转的是 atan(38/104) = 20.072°（不是取整的 20°）—— 取整的话推力的箭尖会差 0.14px 落不到
+   平行四边形的第四个点上，「闭合」就变成「差不多闭合」了。 */
+.wh-body { transform-box:view-box; transform-origin:470px 268px; transform:rotate(-20.072deg); }
+.wh-slab { fill:var(--yellow); opacity:0.85; }
+.wh-thrust { fill:none; stroke:var(--yellow); stroke-width:1.5; opacity:0.9; }
+.wh-thrust-head { fill:var(--yellow); opacity:0.9; }
+
+/* 标签：26px --muted、0.12em，跟上一页和天平那页同一规格。「推力」是黄的 ——
+   它标的就是那根黄箭头，跟「法线」在上一页的待遇一样 */
+.wh-tag { font-size:26px; fill:var(--muted); letter-spacing:0.12em; }
+.wh-tag--y { fill:var(--yellow); opacity:0.85; }
+
+/* 风一直在吹：三支箭头从暗到亮再回去，错开一个半拍，看着像一阵一阵的。
+   飞机那一半没有任何动画 —— 它必须一动不动，这是这一页唯一要传达的事 */
+.slide.active .wh-gust { animation:wh-gust 4.6s cubic-bezier(.45,0,.55,1) infinite; }
+.slide.active .wh-gust:nth-child(2) { animation-delay:-1.5s; }
+.slide.active .wh-gust:nth-child(3) { animation-delay:-3s; }
+@keyframes wh-gust {
+  0%, 100% { opacity:0.22; }
+  45% { opacity:0.7; }
 }

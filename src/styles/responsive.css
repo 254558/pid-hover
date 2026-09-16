@@ -8,6 +8,8 @@
   .t-xl--sm{font-size:3rem;}
   .t-hero{font-size:4rem;}
   .t-big{font-size:2.3rem;}
+  /* 动画页那行大字的小一号版本，桌面是 .t-big 的 0.85，这里照同样比例写死 */
+  .t-big--sm{font-size:1.95rem;}
   .t-mid{font-size:1.8rem;}
   .t-sm{font-size:1.5rem;}
   .act-word{margin:8px 0 4px;}
@@ -23,9 +25,14 @@
   .role-l{min-width:120px;font-size:1.2rem;}
   .role-t{font-size:1.7rem;}
   .role-s{font-size:1.3rem;}
-  /* 动画那页是 920×300 的死画布，窄屏整块缩，别让它撑出屏幕 */
+  /* 动画那几页是死画布（天平 920×300、平面是否水平 920×440、有风 920×440），窄屏整块缩，
+     别让它撑出屏幕。缩完的高度 = 画布高 × 系数，写死在这里，省得占位撑不开 */
   .bal{height:114px;}
   .bal-stage{transform:translateX(-50%) scale(0.38);}
+  .hz{height:167px;}
+  .hz-stage{transform:translateX(-50%) scale(0.38);}
+  .wh{height:167px;}
+  .wh-stage{transform:translateX(-50%) scale(0.38);}
 }
 
 /* 769–1199px 是个尴尬档：版式已经是桌面那一套，但窗口只有一半大，2 倍字号
@@ -39,4 +46,8 @@
   .formula-big{font-size:clamp(1.9rem,4vw,5rem);}
   .bal{height:216px;}
   .bal-stage{transform:translateX(-50%) scale(0.72);}
+  .hz{height:317px;}
+  .hz-stage{transform:translateX(-50%) scale(0.72);}
+  .wh{height:317px;}
+  .wh-stage{transform:translateX(-50%) scale(0.72);}
 }
